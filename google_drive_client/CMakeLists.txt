@@ -1,36 +1,54 @@
-cmake_minimum_required(VERSION 3.18.3)
+cmake_minimum_required(VERSION 3.5)
 
-project(Google_Drive_Project)
+project(ClientGoogleDrive LANGUAGES CXX)
 
-set(BOOST_INCLUDEDIR "D:/all_with_prog/plugins/boost_1_74_0")
-set(BOOST_LIBRARYDIR "D:/all_with_prog/plugins/boost_1_74_0/stage/lib")
-set(BOOST_ROOT "D:/all_with_prog/plugins/boost_1_70_0/boost")
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-find_package(Boost 1.74.0)
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
 
-link_directories( )
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-include_directories(
-    inc
-    chilkat-9.5.0/include
-    ${Boost_INCLUDE_DIRS}
-    )
+# QtCreator supports the following variables for Android, which are identical to qmake Android variables.
+# Check http://doc.qt.io/qt-5/deployment-android.html for more information.
+# They need to be set before the find_package(Qt5 ...) call.
 
-link_directories(
-    ${Boost_LIBRARY_DIRS}
-    chilkat-9.5.0)
+#if(ANDROID)
+#    set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
+#    if (ANDROID_ABI STREQUAL "armeabi-v7a")
+#        set(ANDROID_EXTRA_LIBS
+#            ${CMAKE_CURRENT_SOURCE_DIR}/path/to/libcrypto.so
+#            ${CMAKE_CURRENT_SOURCE_DIR}/path/to/libssl.so)
+#    endif()
+#endif()
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
+find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Network REQUIRED)
 
+if(ANDROID)
+  add_library(ClientGoogleDrive SHARED
+    main.cpp
+    mainwindow.cpp
+    mainwindow.h
+    mainwindow.ui
+    connectwindow.cpp
+    connectwindow.h
+    connectwindow.ui
+  )
+else()
+  add_executable(ClientGoogleDrive
+    main.cpp
+    mainwindow.cpp
+    mainwindow.h
+    mainwindow.ui
+    connectwindow.cpp
+    connectwindow.h
+    connectwindow.ui
+  )
+endif()
 
-set(SRC
-    src/main.cpp
-    src/GoogleDriveController.cpp
-    src/ConnectionController.cpp
-    src/Request.cpp
-)
-
-add_executable(google_project ${SRC})
-
-target_link_libraries(google_project libchilkat-9.5.0.a crypt32 ws2_32 dnsapi)
+target_link_libraries(ClientGoogleDrive PRIVATE Qt${QT_VERSION_MAJOR}::Network)
+target_link_libraries(ClientGoogleDrive PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)

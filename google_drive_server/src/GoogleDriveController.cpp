@@ -1,11 +1,13 @@
 #include "GoogleDriveController.h"
+#include <CkJsonObject.h>
 
-std::string GoogleDriveController::s_access_token = "ya29.c.KpwB5gfm-5acNaeb3LFRZqj5Y0hAv8o-Sq5GK6FHJyUgRt2j6k4je6Xz752Eua1MDU0zLp-P1zJNrwBtw0sA4JUJQr3TFCPFSlN0Vxssg9i5deSPIfXcD3w5M13cF0T0NDpEbf2VjRkJa_36rllDtEhYYK3Dq2kjxk415oZN5cIEQMR1LK3KNnzyATyOqjPn5qPnKSpDA3LnJHrvB9HQ";
+std::string GoogleDriveController::s_access_token = "ya29.c.KpwB6AeByj1vkPXtPqCaL-d7pIn6qGdrTnBA1tD7f-aWdT8ZP4dN4NXAzeC1UTxzHPLfaN95Z1otulxPAz2lruTVc83NlChXs-1wdSMejvNkZfQ_XaVxId9IVJ3NjfgGsku6Wglipy1n2NZ-oYnMHFNK5IzZq_V_zo-OsE1yqcQrABqjQFML-JmX_m7c2Tyd7imIUJkwqhnNnAf2B1K2";
 
 
 GoogleDriveController::GoogleDriveController()
 {
-    do_authorization();
+    get_list_files("test");
+//    do_authorization();
 }
 
 GoogleDriveController&
@@ -73,8 +75,106 @@ GoogleDriveController::restore_access_token_from_json()
     return true;
 }
 
+
+//
+
+
+std::shared_ptr<CkJsonObject>
+GoogleDriveController::get_list_files(const std::string request_body)
+{
+    if (!connect())
+    {
+        return nullptr;
+    }
+
+    std::shared_ptr<CkJsonObject> json_responce(new CkJsonObject);
+    CkStringBuilder sbJson;
+    bool success = m_rest.FullRequestNoBodySb("GET","/drive/v3/files",sbJson);
+    if (success != true) {
+        std::cout << m_rest.lastErrorText() << "\r\n";
+        json_responce->Load(m_rest.lastErrorText());
+        return json_responce;
+    }
+
+    if (m_rest.get_ResponseStatusCode() != 200) {
+        std::cout << "Received error response code: " << m_rest.get_ResponseStatusCode() << "\r\n";
+        std::cout << "Response body:" << "\r\n";
+        std::cout << sbJson.getAsString() << "\r\n";
+        restore_access_token_from_json();
+        json_responce->LoadSb(sbJson);
+        return json_responce;
+    }
+
+    json_responce->LoadSb(sbJson);
+    json_responce->put_EmitCompact(false);
+    return json_responce;
+}
+
+std::shared_ptr<CkJsonObject>
+GoogleDriveController::creane_new_folder(const std::string request_body)
+{
+    std::shared_ptr<CkJsonObject> json_responce(new CkJsonObject);
+    if (!connect())
+    {
+        return nullptr;
+    }
+    //  A multipart upload to Google Drive needs a multipart/related Content-Type
+    m_rest.AddHeader("Content-Type","multipart/related");
+    m_rest.put_PartSelector("1");
+    m_rest.AddHeader("Content-Type","application/json; charset=UTF-8");
+
+    json_responce->AppendString("name", request_body.c_str());
+    json_responce->AppendString("description","A folder to contain test files.");
+    json_responce->AppendString("mimeType","application/vnd.google-apps.folder");
+    m_rest.SetMultipartBodyString(json_responce->emit());
+
+    const char *jsonResponse = m_rest.fullRequestMultipart("POST","/upload/drive/v3/files?uploadType=multipart");
+    if (m_rest.get_LastMethodSuccess() != true) {
+     std::cout << m_rest.lastErrorText() << "\r\n";
+     return nullptr;
+    }
+
+    if (m_rest.get_ResponseStatusCode() != 200) {
+     std::cout << "response status code = " << m_rest.get_ResponseStatusCode() << "\r\n";
+     std::cout << "response status text = " << m_rest.responseStatusText() << "\r\n";
+     std::cout << "response header: " << m_rest.responseHeader() << "\r\n";
+     std::cout << "response JSON: " << jsonResponse << "\r\n";
+     return nullptr;
+    }
+
+    json_responce->Load(jsonResponse);
+
+    json_responce->put_EmitCompact(false);
+//    std::cout << json_responce->emit() << "\r\n";
+
+    return json_responce;
+}
+
+std::shared_ptr<CkJsonObject>
+GoogleDriveController::upload_file(const std::string request_body)
+{
+    std::shared_ptr<CkJsonObject> json_responce;
+
+    return json_responce;
+}
+
+std::shared_ptr<CkJsonObject>
+GoogleDriveController::download_file(const std::string request_body)
+{
+    std::shared_ptr<CkJsonObject> json_responce;
+
+    return json_responce;
+}
+
 bool
-GoogleDriveController::show_list_files()
+GoogleDriveController::do_authorization()
+{
+    restore_access_token_from_json();
+    return true;
+}
+
+bool
+GoogleDriveController::connect()
 {
     bool success;
 
@@ -87,219 +187,11 @@ GoogleDriveController::show_list_files()
     success = m_rest.Connect("www.googleapis.com",443,true,true);
     if (success != true) {
         std::cout << m_rest.lastErrorText() << "\r\n";
-        return false;
     }
-
-    CkStringBuilder sbJson;
-    success = m_rest.FullRequestNoBodySb("GET","/drive/v3/files",sbJson);
-    if (success != true) {
-        std::cout << m_rest.lastErrorText() << "\r\n";
-        return false;
-    }
-
-    if (m_rest.get_ResponseStatusCode() != 200) {
-        std::cout << "Received error response code: " << m_rest.get_ResponseStatusCode() << "\r\n";
-        std::cout << "Response body:" << "\r\n";
-        std::cout << sbJson.getAsString() << "\r\n";
-        return false;
-    }
-
-    CkJsonObject json;
-    json.LoadSb(sbJson);
-
-    //  Show the full JSON response.
-     json.put_EmitCompact(false);
-     std::cout << json.emit() << "\r\n";
-
-     int numFiles = json.SizeOfArray("files");
-     int i = 0;
-     while (i < numFiles) {
-         json.put_I(i);
-         std::cout << "name: " << json.stringOf("files[i].name") << "\r\n";
-         std::cout << "id: " << json.stringOf("files[i].id") << "\r\n";
-         std::cout << "mimeType: " << json.stringOf("files[i].mimeType") << "\r\n";
-         std::cout << "-" << "\r\n";
-         i = i + 1;
-     }
-//    std::cout << "Example Completed." << "\r\n";
-    return true;
+    return success;
 }
 
-bool
-GoogleDriveController::upload_file(std::string file_path)
-{
-    bool success = true;
 
-    //  This example requires the Chilkat API to have been previously unlocked.
-    //  See Global Unlock Sample for sample code.
-
-    //  This example uses a previously obtained access token having permission for the
-    //  Google Drive scope.
-    //  See Get Google Drive OAuth2 Access Token
-
-    CkAuthGoogle gAuth;
-    gAuth.put_AccessToken(s_access_token.c_str());
-
-    CkRest rest;
-
-    //  Connect using TLS.
-    bool bAutoReconnect = true;
-    success = rest.Connect("www.googleapis.com",443,true,bAutoReconnect);
-
-    //  Provide the authentication credentials (i.e. the access token)
-    rest.SetAuthGoogle(gAuth);
-
-    //  -------------------------------------------------------------------------
-    //  A multipart upload to Google Drive needs a multipart/related Content-Type
-    rest.AddHeader("Content-Type","multipart/related");
-
-    //  Specify each part of the request.
-
-    //  The 1st part is JSON with information about the file.
-    rest.put_PartSelector("1");
-    rest.AddHeader("Content-Type","application/json; charset=UTF-8");
-
-    //  Construct the JSON that will contain the metadata about the file data to be uploaded...
-    CkJsonObject json;
-    json.AppendString("name", file_path.c_str());
-    json.AppendString("description", "A picture of a starfish.");
-    json.AppendString("mimeType", "image/jpeg");
-
-    //  To place the file in a folder, we must add a parents[] array to the JSON
-    //  and add the folder ID.
-    //  In a previous example (see Lookup Google Drive Folder ID
-    //  we showed how to find the folder ID for a folder in Google Drive.
-
-    //  Use the folder ID we already looked up..
-    const char *folderId = "0";
-    CkJsonArray *parents = json.AppendArray("parents");
-    parents->AddStringAt(-1,folderId);
-    delete parents;
-
-    rest.SetMultipartBodyString(json.emit());
-
-    //  The 2nd part is the file content, which will contain the binary image data.
-    rest.put_PartSelector("2");
-    rest.AddHeader("Content-Type","image/jpeg");
-
-    CkBinData jpgBytes;
-    success = jpgBytes.LoadFile("qa_data/jpg/starfish.jpg");
-
-    //  Add the data to our upload
-    rest.SetMultipartBodyBd(jpgBytes);
-
-    const char *jsonResponse = rest.fullRequestMultipart("POST","/upload/drive/v3/files?uploadType=multipart");
-    if (rest.get_LastMethodSuccess() != true) {
-        std::cout << rest.lastErrorText() << "\r\n";
-        return false;
-    }
-
-    //  A successful response will have a status code equal to 200.
-    if (rest.get_ResponseStatusCode() != 200) {
-        std::cout << "response status code = " << rest.get_ResponseStatusCode() << "\r\n";
-        std::cout << "response status text = " << rest.responseStatusText() << "\r\n";
-        std::cout << "response header: " << rest.responseHeader() << "\r\n";
-        std::cout << "response JSON: " << jsonResponse << "\r\n";
-        return false;
-    }
-
-    json.Load(jsonResponse);
-
-    //  Show the full JSON response.
-    json.put_EmitCompact(false);
-    std::cout << json.emit() << "\r\n";
-
-    //  A successful response looks like this:
-    //  {
-    //    "kind": "drive#file",
-    //    "id": "0B53Q6OSTWYoldmJ0Z3ZqT2x5MFk",
-    //    "name": "starfish.jpg",
-    //    "mimeType": "image/jpeg"
-    //  }
-
-    //  Get the fileId:
-    std::cout << "fileId: " << json.stringOf("id") << "\r\n";
-    return true;
-}
-
-// MARK: - Private Section
-
-static std::string
-get_str(const char* str)
-{
-    if (!str)
-        return std::string();
-    return std::string(str);
-}
-
-bool
-GoogleDriveController::show_folder_id()
-{
-    bool success = true;
-
-    //  It requires the Chilkat API to have been previously unlocked.
-    //  See Global Unlock Sample for sample code.
-
-    //  This example uses a previously obtained access token having permission for the
-    //  Google Drive scope.
-
-    CkAuthGoogle gAuth;
-    gAuth.put_AccessToken(s_access_token.c_str());
-
-    CkRest rest;
-
-    //  Connect using TLS.
-    bool bAutoReconnect = true;
-    success = rest.Connect("www.googleapis.com",443,true,bAutoReconnect);
-
-    //  Provide the authentication credentials (i.e. the access token)
-    rest.SetAuthGoogle(gAuth);
-
-    CkJsonObject json;
-    json.put_EmitCompact(false);
-
-    //  Get the AAWorkArea folder that is in the Google Drive root.
-    rest.AddQueryParam("q","'root' in parents and name='AAWorkArea'");
-    const char *jsonResponse = rest.fullRequestNoBody("GET","/drive/v3/files");
-    if (rest.get_LastMethodSuccess() != true) {
-        std::cout << rest.lastErrorText() << "\r\n";
-        return false;
-    }
-
-    json.Load(jsonResponse);
-    std::cout << json.emit() << "\r\n";
-    std::cout << "name: " << get_str(json.stringOf("files[0].name")) << "\r\n";
-    std::cout << "id: " << get_str(json.stringOf("files[0].id")) << "\r\n";
-    std::cout << "mimeType: " << get_str(json.stringOf("files[0].mimeType")) << "\r\n";
-    std::cout << "-" << "\r\n";
-
-    rest.ClearAllQueryParams();
-
-    //  Now that we know the ID for the AAWorkarea directory, get the id for the FolderA having AAWorkArea as the parent.
-    CkStringBuilder sbQuery;
-    sbQuery.Append("name = 'FolderA' and '");
-    sbQuery.Append(json.stringOf("files[0].id"));
-    sbQuery.Append("' in parents");
-    rest.AddQueryParamSb("q",sbQuery);
-
-    jsonResponse = rest.fullRequestNoBody("GET","/drive/v3/files");
-    if (rest.get_LastMethodSuccess() != true) {
-        std::cout << rest.lastErrorText() << "\r\n";
-        return false;
-    }
-
-    json.Load(jsonResponse);
-    std::cout << json.emit() << "\r\n";
-    std::cout << "name: " << get_str(json.stringOf("files[0].name")) << "\r\n";
-    std::cout << "id: " << get_str(json.stringOf("files[0].id")) << "\r\n";
-    std::cout << "mimeType: " << get_str(json.stringOf("files[0].mimeType")) << "\r\n";
-    std::cout << "-" << "\r\n";
-    return true;
-}
-
-bool
-GoogleDriveController::do_authorization()
-{
-    restore_access_token_from_json();
-    return true;
-}
+////  Show the full JSON response.
+// json_responce.put_EmitCompact(false);
+// std::cout << json_responce.emit() << "\r\n";

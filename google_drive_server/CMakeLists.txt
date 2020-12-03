@@ -29,6 +29,9 @@ set(SRC
     src/GoogleDriveController.cpp
     src/ConnectionController.cpp
     src/Request.cpp
+    src/TaskController.cpp
+    src/Task.cpp
+    src/Responce.cpp
 )
 
 add_executable(google_project ${SRC})

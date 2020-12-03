@@ -9,10 +9,10 @@
 #include <CkRest.h>
 #include <CkOAuth2.h>
 #include <CkStringBuilder.h>
-#include <CkJsonObject.h>
 #include <CkJsonArray.h>
 #include <CkBinData.h>
 
+class CkJsonObject;
 
 class GoogleDriveController
 {
@@ -27,15 +27,15 @@ public:
 
     bool restore_access_token_from_json();
 
-    bool show_list_files();
-    bool upload_file(std::string file_path);
-    bool download_file(std::string file_path);
-
-    bool show_folder_id();
+    std::shared_ptr<CkJsonObject> get_list_files(const std::string request_body);
+    std::shared_ptr<CkJsonObject> upload_file(const std::string request_body);
+    std::shared_ptr<CkJsonObject> creane_new_folder(const std::string folder_name);
+    std::shared_ptr<CkJsonObject> download_file(const std::string request_body);
 
 private:
     // TODO: add ErrorCode to responce in each method
     bool do_authorization();
+    bool connect();
 
 private:
     static std::string s_access_token;
