@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>FileWindow</class>
+ <widget class="QWidget" name="FileWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1273</width>
+    <height>606</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <widget class="QPushButton" name="list_files_button">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>390</y>
+     <width>81</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>List Files</string>
+   </property>
+  </widget>
+  <widget class="QTextBrowser" name="responce_bar">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>711</width>
+     <height>331</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="folder_name_fild">
+   <property name="geometry">
+    <rect>
+     <x>100</x>
+     <y>430</y>
+     <width>411</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="placeholderText">
+    <string>Name of new folder</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="new_folder_button">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>430</y>
+     <width>81</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>New Folder</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="upload_file_button">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>470</y>
+     <width>81</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Upload File</string>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="file_path_fild">
+   <property name="geometry">
+    <rect>
+     <x>100</x>
+     <y>470</y>
+     <width>411</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="documentTitle">
+    <string/>
+   </property>
+   <property name="placeholderText">
+    <string>Path to file</string>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="new_folder_parent_id">
+   <property name="geometry">
+    <rect>
+     <x>520</x>
+     <y>430</y>
+     <width>201</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="placeholderText">
+    <string>Parent ID</string>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="upload_parent_id">
+   <property name="geometry">
+    <rect>
+     <x>520</x>
+     <y>470</y>
+     <width>201</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="placeholderText">
+    <string>Parent ID</string>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="list_files_parent_id">
+   <property name="geometry">
+    <rect>
+     <x>100</x>
+     <y>390</y>
+     <width>211</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="placeholderText">
+    <string>Parent ID</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="remove_file_button">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>510</y>
+     <width>81</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Remove file</string>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="remove_file_id">
+   <property name="geometry">
+    <rect>
+     <x>100</x>
+     <y>510</y>
+     <width>211</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="placeholderText">
+    <string>Parent ID</string>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="file_to_download_id">
+   <property name="geometry">
+    <rect>
+     <x>100</x>
+     <y>550</y>
+     <width>211</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="documentTitle">
+    <string/>
+   </property>
+   <property name="placeholderText">
+    <string>ID</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="download_file_button">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>550</y>
+     <width>81</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Download file</string>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="file_to_download_name">
+   <property name="geometry">
+    <rect>
+     <x>320</x>
+     <y>550</y>
+     <width>261</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="documentTitle">
+    <string/>
+   </property>
+   <property name="placeholderText">
+    <string>File name</string>
+   </property>
+  </widget>
+  <widget class="QTextBrowser" name="status_bar">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>350</y>
+     <width>711</width>
+     <height>31</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QListView" name="file_list_view">
+   <property name="geometry">
+    <rect>
+     <x>750</x>
+     <y>10</y>
+     <width>471</width>
+     <height>561</height>
+    </rect>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

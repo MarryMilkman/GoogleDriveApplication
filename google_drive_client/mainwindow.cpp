@@ -4,7 +4,7 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
-    , connect_window(new ConnectWindow)
+    , file_window(new FileWindow)
 {
     ui->setupUi(this);
 }
@@ -16,7 +16,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_login_button_clicked()
 {
-    connect_window->show();
+    file_window->show();
     this->close();
     // ConnectionController.
 }

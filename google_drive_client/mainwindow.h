@@ -2,7 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <connectwindow.h>
+#include <FileWindow.h>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -21,6 +21,6 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
-    ConnectWindow *connect_window;
+    FileWindow *file_window;
 };
 #endif // MAINWINDOW_H

@@ -8,7 +8,7 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # QtCreator supports the following variables for Android, which are identical to qmake Android variables.
@@ -24,31 +24,34 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 #    endif()
 #endif()
 
+
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Network REQUIRED)
 
-if(ANDROID)
-  add_library(ClientGoogleDrive SHARED
+include_directories(inc)
+
+add_executable(ClientGoogleDrive
     main.cpp
     mainwindow.cpp
     mainwindow.h
     mainwindow.ui
-    connectwindow.cpp
-    connectwindow.h
-    connectwindow.ui
-  )
-else()
-  add_executable(ClientGoogleDrive
-    main.cpp
-    mainwindow.cpp
-    mainwindow.h
-    mainwindow.ui
-    connectwindow.cpp
-    connectwindow.h
-    connectwindow.ui
-  )
-endif()
+    FileWindow.cpp
+    FileWindow.h
+    FileWindow.ui
+#    ConnectionController.cpp
+#    ConnectionController.h
+    Request.cpp
+    Request.h
+    Task.cpp
+    Task.h
+    File.cpp
+    File.h
+    FileWorker.cpp
+    FileWorker.h
+    FileWorkerRequest.cpp
+    FileWorkerRequest.hpp
+)
 
 target_link_libraries(ClientGoogleDrive PRIVATE Qt${QT_VERSION_MAJOR}::Network)
 target_link_libraries(ClientGoogleDrive PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
