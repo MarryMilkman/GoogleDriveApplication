@@ -30,7 +30,7 @@ public:
     };
 
 public:
-    FileWorker() = default;
+    FileWorker();
 
 //    void run() override;
 
@@ -38,12 +38,14 @@ public:
     void stop();
 
     const std::map<QString, std::shared_ptr<File>>& get_current_list_files() const;
+    std::shared_ptr<File>                           get_worker_parent() const;
+    void                                            set_perent(std::shared_ptr<File> parent_ptr);
 
 public slots:
     void    slot_task_status(const QString status);
     void    slot_task_finished();
 
-    void    slot_add_request(Request& request);
+    void    slot_add_request(Request request);
 
 private:
     void process_task_responce(std::shared_ptr<Task>& task);
@@ -60,6 +62,7 @@ private:
     std::atomic<bool>                           m_some_task_completed;
     std::vector<std::shared_ptr<Task>>          m_list_tasks;
     std::map<QString, std::shared_ptr<File>>    m_list_files;
+    std::shared_ptr<File>                       m_parent;
 
     std::mutex                                  m_task_mutex;
     std::mutex                                  m_file_mutex;

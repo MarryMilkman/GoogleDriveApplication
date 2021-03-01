@@ -40,7 +40,7 @@ public:
     ErrorCode                                   set_parent(std::shared_ptr<File> parent);
 
     std::map<QString, std::shared_ptr<File>>&   get_childs();
-    ErrorCode                                   add_child(std::shared_ptr<File>& child);
+    ErrorCode                                   add_child(std::shared_ptr<File> child);
 
     std::map<QString, std::shared_ptr<File>>&   get_upper_list();
 
@@ -57,7 +57,7 @@ private:
     QString                                     m_full_name;
     QString                                     m_extension;
     size_t                                      m_size = 0;
-    QString                                     m_id;
+    QString                                     m_id{""};
     QString                                     m_modifiedTime;
 
     Type                                        m_type;

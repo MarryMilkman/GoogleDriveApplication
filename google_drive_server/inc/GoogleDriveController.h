@@ -3,17 +3,6 @@
 
 #include "lib.h"
 
-#include <CkFileAccess.h>
-#include <CkAuthGoogle.h>
-#include <CkSocket.h>
-#include <CkRest.h>
-#include <CkOAuth2.h>
-#include <CkStringBuilder.h>
-#include <CkJsonArray.h>
-#include <CkBinData.h>
-
-class CkJsonObject;
-
 class GoogleDriveController
 {
     GoogleDriveController();
@@ -27,10 +16,17 @@ public:
 
     bool restore_access_token_from_json();
 
-    std::shared_ptr<CkJsonObject> get_list_files(const std::string request_body);
-    std::shared_ptr<CkJsonObject> upload_file(const std::string request_body);
-    std::shared_ptr<CkJsonObject> creane_new_folder(const std::string folder_name);
-    std::shared_ptr<CkJsonObject> download_file(const std::string request_body);
+    std::shared_ptr<CkJsonObject> get_list_files(const std::string parent_id);
+    std::shared_ptr<CkJsonObject> creane_new_folder(const std::string folder_name, std::string parent_id);
+    std::shared_ptr<CkJsonObject> upload_file(const std::string file_name,
+                                              const std::string file_type,
+                                              CkByteData& data,
+                                              const std::string parent_id);
+
+    std::shared_ptr<CkJsonObject> download_file(const std::string file_id,
+                                                CkByteData& received_file_data);
+
+    std::shared_ptr<CkJsonObject> remove_file(const std::string file_id);
 
 private:
     // TODO: add ErrorCode to responce in each method

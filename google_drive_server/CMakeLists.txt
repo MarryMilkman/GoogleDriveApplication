@@ -32,6 +32,8 @@ set(SRC
     src/TaskController.cpp
     src/Task.cpp
     src/Responce.cpp
+    src/UserController.cpp
+    src/User.cpp
 )
 
 add_executable(google_project ${SRC})

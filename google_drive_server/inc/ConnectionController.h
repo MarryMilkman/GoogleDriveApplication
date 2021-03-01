@@ -1,7 +1,6 @@
 #pragma once
 #include <lib.h>
 #include <Request.h>
-#include <CkSocket.h>
 
 class Responce;
 class TaskController;
@@ -20,7 +19,9 @@ public:
     void operator()();
 
     void stop();
-    void send_responce(Responce& responce);
+//    void send_responce(Responce& responce);
+    void send_data(const std::string& str_data,
+                   std::shared_ptr<CkSocket> socket);
 
 private:
     void init();

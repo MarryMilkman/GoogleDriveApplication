@@ -5,7 +5,6 @@
 
 #include <Request.h>
 #include <Responce.h>
-#include <CkJsonObject.h>
 
 class GoogleDriveController;
 
@@ -24,24 +23,33 @@ public:
 
     };
 
-    Task(Request request);
+    Task(CkSocket* socket);
+//    Task(Request request);
     Task() = delete;
     ~Task() = default;
 
     void        set_work_status(WorkStatus status);
     WorkStatus  get_work_status() const;
 
+    void        set_ck_task(CkTask* task);
+    std::shared_ptr<CkTask> get_ck_task() const;
+
     void        work();
 
 private:
+    void                            investigation_socket();
     std::shared_ptr<CkJsonObject>   request_data_from_google_drive_controller();
+    void                            send_responce();
 
 
 private:
     WorkStatus                      m_work_status{WorkStatus::NEED_PROCESS_REQUEST};
+    std::shared_ptr<CkSocket>       m_socket;
     Request                         m_request;
-
     Responce                        m_responce;
+
+    CkByteData                      m_file_data;
+    std::shared_ptr<CkTask>         m_ck_task;
 //    Responce   m_responce;
 
 };

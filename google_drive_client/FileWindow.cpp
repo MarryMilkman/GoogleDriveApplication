@@ -96,7 +96,7 @@ void FileWindow::on_list_files_button_clicked()
     Request request(Request::RequestType::LIST_FILES,
                     m_ui->list_files_parent_id->toPlainText(),
                     "");
-    qRegisterMetaType<Request>();
+    qRegisterMetaType<Request>("Request&");
     emit signal_add_request(request);
 
 //    request.m_callback_status = [this](std::string status)
@@ -123,7 +123,7 @@ FileWindow::on_new_folder_button_clicked()
     Request request(Request::RequestType::NEW_FOLDER,
                     m_ui->new_folder_parent_id->toPlainText(),
                     folder_name);
-    qRegisterMetaType<Request>();
+    qRegisterMetaType<Request>("Request&");
     emit signal_add_request(request);
 //    request.m_callback_status = [this](std::string status)
 //    {
@@ -299,7 +299,7 @@ FileWindow::slot_need_update(FileWorker::Status status, QJsonDocument doc)
     static_cast<void>(status);
     QJsonValue data_for_response_bar = doc.object()["general_response"];
 
-    m_ui->responce_bar->setText(data_for_response_bar.toString());
+    m_ui->responce_bar->setText(doc.toJson().toStdString().c_str());
     update_files_view();
 }
 
@@ -376,8 +376,8 @@ FileWindow::slot_new_status(const QString status)
 
 void FileWindow::on_file_list_view_doubleClicked(const QModelIndex &index)
 {
-    int file_index = index.column() - 1;
-    QString request_file_id("parent");
+    int file_index = index.row() - 1;
+    QString request_file_id("");
 
     if (file_index >= 0)
     {
@@ -386,10 +386,16 @@ void FileWindow::on_file_list_view_doubleClicked(const QModelIndex &index)
             if (file_index-- == 0)
             {
                 std::shared_ptr<File> file = map_iter.second;
+                m_worker.set_perent(file);
                 request_file_id = file->get_id();
                 break;
             }
         }
+    }
+    else
+    {
+        m_worker.set_perent(m_worker.get_worker_parent()->get_parent());
+        request_file_id = m_worker.get_worker_parent()->get_id();
     }
     Request request(Request::RequestType::LIST_FILES,
                     request_file_id,

@@ -78,7 +78,7 @@ private slots:
     void on_file_list_view_doubleClicked(const QModelIndex &index);
 
 signals:
-    void signal_add_request(Request& request);
+    void signal_add_request(Request request);
 //    void
 
 private:

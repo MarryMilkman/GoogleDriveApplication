@@ -1,6 +1,6 @@
 #include <ConnectionController.h>
 #include <TaskController.h>
-#include "Responce.h"
+#include <Responce.h>
 
 ConnectionController::ConnectionController()
     : m_task_cotroller(TaskController::get_instance())
@@ -48,23 +48,56 @@ ConnectionController::stop()
     m_stop_flag = true;
 }
 
-void
-ConnectionController::send_responce(Responce& responce)
-{
-    auto socket = responce.get_socket();
+//void
+//ConnectionController::send_responce(Responce& responce)
+//{
+//    auto socket = responce.get_socket();
+//    std::string str_general_responce = responce.form_general_responce();
 
-    socket->SendString(responce.form_responce().c_str());
-    socket->Close(100);
-//    CkTask* task = responce.get_socket()->SendStringAsync(
-//                       responce.form_responce().c_str());
-//    task->Run();
+//    send_data(str_general_responce, socket);
+
+//    std::string str_file_data = responce.form_responce_file_data();
+//    if (!str_file_data.empty())
 //    {
-//        std::lock_guard<std::mutex> lock(m_task_mutex);
-
-//        m_list_chilkat_tasks.push_back(std::shared_ptr<CkTask>(task));
+//        send_data(str_file_data, socket);
 //    }
-}
 
+////    socket->Close(100);
+////    CkTask* task = responce.get_socket()->SendStringAsync(
+////                       responce.form_responce().c_str());
+////    task->Run();
+////    {
+////        std::lock_guard<std::mutex> lock(m_task_mutex);
+
+////        m_list_chilkat_tasks.push_back(std::shared_ptr<CkTask>(task));
+////    }
+//}
+
+void
+ConnectionController::send_data(const std::string& str_data,
+                                std::shared_ptr<CkSocket> socket)
+{
+    static size_t number_bytes_pir_one_send = 65536;
+    size_t sended_bytes = 0;
+    size_t response_size = str_data.size();
+    CkBinData bin_data;
+
+    bin_data.AppendString(str_data.c_str(), "utf-8");
+    while (sended_bytes < response_size)
+    {
+        bool success = socket->SendBd(bin_data, sended_bytes, number_bytes_pir_one_send);
+        if (!success) {
+            CkString test_error;
+
+            socket->get_LastErrorText(test_error);
+            std::cerr << test_error.getString() << "\n";
+            return;
+        }
+        sended_bytes += number_bytes_pir_one_send;
+        std::cerr << "Sended " << sended_bytes << " from " << response_size << "\n";
+    }
+    std::cerr << "Sending completed\n";
+}
 
 void
 ConnectionController::listen_new_conection()
@@ -76,7 +109,7 @@ ConnectionController::listen_new_conection()
         return;
     }
     std::cerr << "NEW CONNECTIO!\n";
-    m_task_cotroller.create_task(Request(connectedSocket));
+    m_task_cotroller.create_task(connectedSocket);
 }
 
 //void

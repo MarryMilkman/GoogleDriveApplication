@@ -18,7 +18,8 @@ public:
         UPLOAD,
         NEW_FOLDER,
         REMOVE,
-        GET_ROOT
+        SIGN_IN,
+        SIGN_UP
     };
 
     ~Request() = default;
@@ -31,6 +32,7 @@ public:
             QJsonObject file_info = QJsonObject());
 
     QJsonObject get_json_request() const;
+    QJsonObject get_json_request_authorization() const;
 
     RequestType m_type = RequestType::UNKNOWN;
     QString     m_id;
