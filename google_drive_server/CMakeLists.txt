@@ -2,23 +2,33 @@ cmake_minimum_required(VERSION 3.18.3)
 
 project(Google_Drive_Project)
 
-set(BOOST_INCLUDEDIR "D:/all_with_prog/plugins/boost_1_74_0")
-set(BOOST_LIBRARYDIR "D:/all_with_prog/plugins/boost_1_74_0/stage/lib")
-set(BOOST_ROOT "D:/all_with_prog/plugins/boost_1_70_0/boost")
+if (DEFINED boost_custom)
+    set(BOOST_INCLUDEDIR "${boost_custom}")
+    set(BOOST_LIBRARYDIR "${boost_custom}/stage/lib")
+    set(BOOST_ROOT "${boost_custom}/boost")
+endif ()
 
-find_package(Boost 1.74.0)
+if (DEFINED chilkat)
+    set(CHILKAT_DIR ${chilkat})
+    set(CHILKAT_INC ${chilkat}/include)
+else ()
+    set(CHILKAT_DIR chilkat-9.5.0)
+    set(CHILKAT_INC chilkat-9.5.0/include)
+endif ()
+
+find_package(Boost 1.74.0 )
 
 link_directories( )
 
 include_directories(
     inc
-    chilkat-9.5.0/include
+    ${CHILKAT_INC}
     ${Boost_INCLUDE_DIRS}
     )
 
 link_directories(
     ${Boost_LIBRARY_DIRS}
-    chilkat-9.5.0)
+    ${CHILKAT_DIR})
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
@@ -38,4 +48,10 @@ set(SRC
 
 add_executable(google_project ${SRC})
 
-target_link_libraries(google_project libchilkat-9.5.0.a crypt32 ws2_32 dnsapi)
+
+if (DEFINED WIN32)
+    target_link_libraries(google_project libchilkat-9.5.0.a crypt32 ws2_32 dnsapi)
+else ()
+    target_link_libraries(google_project libchilkat-9.5.0.a)
+endif ()
+

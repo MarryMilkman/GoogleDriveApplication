@@ -29,7 +29,8 @@ GoogleDriveController::restore_access_token_from_json()
     s_access_token.clear();
 
     CkFileAccess fac;
-    const char *jsonKey = fac.readEntireTextFile("../../GoogleAPI/GDFileSystem-da356ada5400.json","utf-8");
+    // "../../GoogleAPI/GDFileSystem-da356ada5400.json"
+    const char *jsonKey = fac.readEntireTextFile(google_drive::path_to_json_key.c_str(), "utf-8");
     if (fac.get_LastMethodSuccess() != true) {
         std::cout << fac.lastErrorText() << "\r\n";
         return false;

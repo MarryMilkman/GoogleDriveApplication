@@ -3,6 +3,10 @@
 
 #include "lib.h"
 
+namespace google_drive {
+static std::string path_to_json_key{};
+}
+
 class GoogleDriveController
 {
     GoogleDriveController();

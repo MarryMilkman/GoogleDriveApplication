@@ -5,6 +5,10 @@
 class Responce;
 class TaskController;
 
+namespace connection_controller {
+static int listen_port{5555};
+}
+
 class ConnectionController
 {
 private:

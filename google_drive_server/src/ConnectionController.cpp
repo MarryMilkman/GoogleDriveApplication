@@ -19,7 +19,7 @@ ConnectionController::get_instance()
 void
 ConnectionController::init()
 {
-    bool success = m_listen_socket.BindAndListen(5555, MAX_CONNECTION);
+    bool success = m_listen_socket.BindAndListen(connection_controller::listen_port, MAX_CONNECTION);
     if (success != true) {
         std::cout << m_listen_socket.lastErrorText() << "\r\n";
         return;
