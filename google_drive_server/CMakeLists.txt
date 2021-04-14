@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.18.3)
+cmake_minimum_required(VERSION 3.16.3)
 
 project(Google_Drive_Project)
 
@@ -38,7 +38,7 @@ include_directories(
 
 link_directories(
     ${Boost_LIBRARY_DIRS}
-    ${CHILKAT_DIR})
+    ${CHILKAT_LIB})
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
