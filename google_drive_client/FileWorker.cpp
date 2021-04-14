@@ -32,11 +32,6 @@
 //    }
 //}
 
-FileWorker::FileWorker()
-{
-    m_parent = std::make_shared<File>();
-}
-
 void
 FileWorker::stop()
 {
@@ -46,24 +41,9 @@ FileWorker::stop()
 const std::map<QString, std::shared_ptr<File>>&
 FileWorker::get_current_list_files() const
 {
-    return m_parent->get_childs();
+    return m_list_files;
 }
 
-std::shared_ptr<File>
-FileWorker::get_worker_parent() const
-{
-    return m_parent;
-}
-
-void
-FileWorker::set_perent(std::shared_ptr<File> parent_ptr)
-{
-    if (parent_ptr == nullptr)
-    {
-        return;
-    }
-    m_parent = parent_ptr;
-}
 
 void
 FileWorker::slot_task_status(const QString status)
@@ -119,44 +99,41 @@ FileWorker::process_task_responce(std::shared_ptr<Task>& task)
 void
 FileWorker::update_files(std::shared_ptr<Task>& task)
 {
-    assert(m_parent != nullptr);
     switch (task->get_request().m_type)
     {
+    case Request::RequestType::GET_ROOT:
+    {
+        break;
+    }
     case Request::RequestType::LIST_FILES:
     {
         QJsonDocument doc = QJsonDocument::fromJson(task->get_json_data());
         QJsonArray json_files_arr = doc.object()["general_response"].toObject()["files"].toArray();
-        std::map<QString, std::shared_ptr<File>>& list_childs = m_parent->get_childs();
-
-        if (static_cast<long long>(list_childs.size()) != json_files_arr.size())
+        int i = 0;
+        if (static_cast<long long>(m_list_files.size()) > json_files_arr.size())
         {
-            for(auto& file_map : m_parent->get_childs())
+            for(auto& file_map : m_list_files)
             {
                 auto& file_ptr = file_map.second;
                 file_ptr->remove_relationships();
             }
-            list_childs.clear();
+            m_list_files.clear();
         }
-        int i = 0;
-
         while (i < json_files_arr.size())
         {
             QJsonValue json_file = json_files_arr[i];
             QString file_id = json_file.toObject()["id"].toString();
-            if (list_childs.count(file_id) > 0)
+            if (m_list_files.count(file_id))
             {
                 QString modifiedTime = json_file.toObject()["modifiedTime"].toString();
-                if (list_childs[file_id]->get_modifiedTime() != modifiedTime)
+                if (m_list_files[file_id]->get_modifiedTime() != modifiedTime)
                 {
-                    list_childs[file_id]->init_file(json_file);
+                    m_list_files[file_id]->init_file(json_file);
                 }
             }
             else
             {
-                auto file = std::make_shared<File>(json_file);
-
-                file->set_parent(m_parent);
-                m_parent->add_child(file);
+                m_list_files[file_id] = std::make_shared<File>(json_file);
             }
             i++;
         }
@@ -166,9 +143,9 @@ FileWorker::update_files(std::shared_ptr<Task>& task)
 }
 
 void
-FileWorker::slot_add_request(Request request)
+FileWorker::slot_add_request(Request& request)
 {
-//    preprocess_request(request);
+    preprocess_request(request);
     qRegisterMetaType<Status>();
     emit signal_need_update_winow(Status::NEED_UPDATE_SCREEN, QJsonDocument());
     std::shared_ptr<Task> task = std::make_shared<Task>(request);
@@ -191,23 +168,19 @@ FileWorker::slot_add_request(Request request)
     task->execude();
 }
 
-//void
-//FileWorker::preprocess_request(Request& request)
-//{
-//    if (request.m_id == "parent" && !m_list_files.empty())
-//    {
-//        std::lock_guard<std::mutex> lock(m_file_mutex);
-//        std::shared_ptr<File> file_ptr = m_list_files.begin()->second;
-//        if (file_ptr != nullptr && file_ptr->get_parent() != nullptr)
-//        {
-//            m_list_files = file_ptr->get_upper_list();
-//            request.m_id = (file_ptr->get_parent()->get_parent() != nullptr)
-//                    ? file_ptr->get_parent()->get_parent()->get_id()
-//                    : "";
-//        }
-//    }
-//    if (request.m_id == "parent")
-//    {
-//        request.m_id = "";
-//    }
-//}
+void
+FileWorker::preprocess_request(Request& request)
+{
+    if (request.m_id == "parent" && !m_list_files.empty())
+    {
+        std::lock_guard<std::mutex> lock(m_file_mutex);
+        std::shared_ptr<File>& file_ptr = m_list_files[0];
+        if (file_ptr != nullptr && file_ptr->get_parent() != nullptr)
+        {
+            m_list_files = file_ptr->get_upper_list();
+            request.m_id = (file_ptr->get_parent()->get_parent() != nullptr)
+                    ? file_ptr->get_parent()->get_parent()->get_id()
+                    : "";
+        }
+    }
+}

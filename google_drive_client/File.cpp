@@ -31,7 +31,7 @@ File::init_file(QJsonValue data)
 void
 File::remove_relationships()
 {
-//    m_parent = nullptr;
+    m_parent = nullptr;
     for(auto& file_map : m_list_childs)
     {
         auto& file_ptr = file_map.second;
@@ -45,7 +45,7 @@ File::ErrorCode
 File::is_valid() const
 {
     if (m_id.isEmpty() || m_extension.isEmpty()
-        || m_full_name.isEmpty() || m_type == Type::UNKNOWN || m_modifiedTime.isEmpty())
+        || m_full_name.isEmpty() || m_type != Type::UNKNOWN || m_modifiedTime.isEmpty())
     {
         return ErrorCode::ERROR_INIT;
     }
@@ -65,16 +65,16 @@ File::set_parent(std::shared_ptr<File> parent)
     {
         return ErrorCode::ERROR_NULLPTR;
     }
-//    ErrorCode file_check = parent->is_valid();
+    ErrorCode file_check = parent->is_valid();
 
-//    if (file_check != ErrorCode::ERROR_NONE)
-//    {
-//        return file_check;
-//    }
-//    if (parent->get_type() != Type::FOLDER)
-//    {
-//        return ErrorCode::ERROR_NOT_FOLDER;
-//    }
+    if (file_check != ErrorCode::ERROR_NONE)
+    {
+        return file_check;
+    }
+    if (parent->get_type() != Type::FOLDER)
+    {
+        return ErrorCode::ERROR_NOT_FOLDER;
+    }
     m_parent = parent;
 
     return ErrorCode::ERROR_NONE;
@@ -87,7 +87,7 @@ File::get_childs()
 }
 
 File::ErrorCode
-File::add_child(std::shared_ptr<File> child)
+File::add_child(std::shared_ptr<File>& child)
 {
     if (child == nullptr)
     {

@@ -65,7 +65,7 @@ signals:
 
 private:
     std::unique_ptr<QTcpSocket> m_socket;
-    const Request               m_request;
+    const Request&              m_request;
 
     Status                      m_status{Status::PENDING_EXECUTION};
     ErrorCode                   m_error_code{ErrorCode::ERROR_NONE};
